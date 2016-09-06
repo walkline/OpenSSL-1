@@ -61,7 +61,7 @@
 
 # include <openssl/e_os2.h>
 
-# ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>
 # endif
 # include <stdarg.h>
@@ -212,6 +212,21 @@ extern "C" {
 #  define BIO_FLAGS_UPLINK        0
 # endif
 
+/* Used in BIO_gethostbyname() */
+# define BIO_GHBN_CTRL_HITS              1
+# define BIO_GHBN_CTRL_MISSES            2
+# define BIO_GHBN_CTRL_CACHE_SIZE        3
+# define BIO_GHBN_CTRL_GET_ENTRY         4
+# define BIO_GHBN_CTRL_FLUSH             5
+
+/* Mostly used in the SSL BIO */
+/*-
+ * Not used anymore
+ * #define BIO_FLAGS_PROTOCOL_DELAYED_READ 0x10
+ * #define BIO_FLAGS_PROTOCOL_DELAYED_WRITE 0x20
+ * #define BIO_FLAGS_PROTOCOL_STARTUP   0x40
+ */
+
 # define BIO_FLAGS_BASE64_NO_NL  0x100
 
 /*
@@ -321,8 +336,8 @@ struct bio_st {
     struct bio_st *next_bio;    /* used by filter BIOs */
     struct bio_st *prev_bio;    /* used by filter BIOs */
     int references;
-    uint64_t num_read;
-    uint64_t num_write;
+    unsigned long num_read;
+    unsigned long num_write;
     CRYPTO_EX_DATA ex_data;
 };
 
@@ -464,11 +479,11 @@ struct bio_dgram_sctp_prinfo {
 # define BIO_get_conn_hostname(b)  BIO_ptr_ctrl(b,BIO_C_GET_CONNECT,0)
 # define BIO_get_conn_port(b)      BIO_ptr_ctrl(b,BIO_C_GET_CONNECT,1)
 # define BIO_get_conn_ip(b)               BIO_ptr_ctrl(b,BIO_C_GET_CONNECT,2)
-# define BIO_get_conn_int_port(b) BIO_int_ctrl(b,BIO_C_GET_CONNECT,3,0)
+# define BIO_get_conn_int_port(b) BIO_ctrl(b,BIO_C_GET_CONNECT,3,NULL)
 
 # define BIO_set_nbio(b,n)       BIO_ctrl(b,BIO_C_SET_NBIO,(n),NULL)
 
-/* BIO_s_accept_socket() */
+/* BIO_s_accept() */
 # define BIO_set_accept_port(b,name) BIO_ctrl(b,BIO_C_SET_ACCEPT,0,(char *)name)
 # define BIO_get_accept_port(b)  BIO_ptr_ctrl(b,BIO_C_GET_ACCEPT,0)
 /* #define BIO_set_nbio(b,n)    BIO_ctrl(b,BIO_C_SET_NBIO,(n),NULL) */
@@ -481,6 +496,7 @@ struct bio_dgram_sctp_prinfo {
 # define BIO_set_bind_mode(b,mode) BIO_ctrl(b,BIO_C_SET_BIND_MODE,mode,NULL)
 # define BIO_get_bind_mode(b,mode) BIO_ctrl(b,BIO_C_GET_BIND_MODE,0,NULL)
 
+/* BIO_s_accept() and BIO_s_connect() */
 # define BIO_do_connect(b)       BIO_do_handshake(b)
 # define BIO_do_accept(b)        BIO_do_handshake(b)
 # define BIO_do_handshake(b)     BIO_ctrl(b,BIO_C_DO_STATE_MACHINE,0,NULL)
@@ -500,12 +516,15 @@ struct bio_dgram_sctp_prinfo {
 # define BIO_get_url(b,url)      BIO_ctrl(b,BIO_C_GET_PROXY_PARAM,2,(char *)(url))
 # define BIO_get_no_connect_return(b)    BIO_ctrl(b,BIO_C_GET_PROXY_PARAM,5,NULL)
 
+/* BIO_s_datagram(), BIO_s_fd(), BIO_s_socket(), BIO_s_accept() and BIO_s_connect() */
 # define BIO_set_fd(b,fd,c)      BIO_int_ctrl(b,BIO_C_SET_FD,c,fd)
 # define BIO_get_fd(b,c)         BIO_ctrl(b,BIO_C_GET_FD,0,(char *)c)
 
+/* BIO_s_file() */
 # define BIO_set_fp(b,fp,c)      BIO_ctrl(b,BIO_C_SET_FILE_PTR,c,(char *)fp)
 # define BIO_get_fp(b,fpp)       BIO_ctrl(b,BIO_C_GET_FILE_PTR,0,(char *)fpp)
 
+/* BIO_s_fd() and BIO_s_file() */
 # define BIO_seek(b,ofs) (int)BIO_ctrl(b,BIO_C_FILE_SEEK,ofs,NULL)
 # define BIO_tell(b)     (int)BIO_ctrl(b,BIO_C_FILE_TELL,0,NULL)
 
@@ -618,8 +637,8 @@ int BIO_set_ex_data(BIO *bio, int idx, void *data);
 void *BIO_get_ex_data(BIO *bio, int idx);
 int BIO_get_ex_new_index(long argl, void *argp, CRYPTO_EX_new *new_func,
                          CRYPTO_EX_dup *dup_func, CRYPTO_EX_free *free_func);
-uint64_t BIO_number_read(BIO *bio);
-uint64_t BIO_number_written(BIO *bio);
+unsigned long BIO_number_read(BIO *bio);
+unsigned long BIO_number_written(BIO *bio);
 
 /* For BIO_f_asn1() */
 int BIO_asn1_set_prefix(BIO *b, asn1_ps_func *prefix,
@@ -631,7 +650,7 @@ int BIO_asn1_set_suffix(BIO *b, asn1_ps_func *suffix,
 int BIO_asn1_get_suffix(BIO *b, asn1_ps_func **psuffix,
                         asn1_ps_func **psuffix_free);
 
-# ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_FP_API
 BIO_METHOD *BIO_s_file(void);
 BIO *BIO_new_file(const char *filename, const char *mode);
 BIO *BIO_new_fp(FILE *stream, int close_flag);
@@ -670,8 +689,7 @@ long BIO_debug_callback(BIO *bio, int cmd, const char *argp, int argi,
                         long argl, long ret);
 
 BIO_METHOD *BIO_s_mem(void);
-BIO_METHOD *BIO_s_secmem(void);
-BIO *BIO_new_mem_buf(void *buf, int len);
+BIO *BIO_new_mem_buf(const void *buf, int len);
 BIO_METHOD *BIO_s_socket(void);
 BIO_METHOD *BIO_s_connect(void);
 BIO_METHOD *BIO_s_accept(void);
@@ -708,7 +726,7 @@ int BIO_dump_indent_cb(int (*cb) (const void *data, size_t len, void *u),
                        void *u, const char *s, int len, int indent);
 int BIO_dump(BIO *b, const char *bytes, int len);
 int BIO_dump_indent(BIO *b, const char *bytes, int len, int indent);
-# ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_FP_API
 int BIO_dump_fp(FILE *fp, const char *s, int len);
 int BIO_dump_indent_fp(FILE *fp, const char *s, int len, int indent);
 # endif

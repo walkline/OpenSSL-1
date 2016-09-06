@@ -1,4 +1,4 @@
-/* crypto/ui/ui.h -*- mode:C; c-file-style: "eay" -*- */
+/* crypto/ui/ui.h */
 /*
  * Written by Richard Levitte (richard@levitte.org) for the OpenSSL project
  * 2001.
@@ -60,7 +60,7 @@
 #ifndef HEADER_UI_H
 # define HEADER_UI_H
 
-# ifdef OPENSSL_USE_DEPRECATED
+# ifndef OPENSSL_NO_DEPRECATED
 #  include <openssl/crypto.h>
 # endif
 # include <openssl/safestack.h>

@@ -124,6 +124,8 @@ typedef struct {
 } PKCS12_SAFEBAG;
 
 DECLARE_STACK_OF(PKCS12_SAFEBAG)
+DECLARE_ASN1_SET_OF(PKCS12_SAFEBAG)
+DECLARE_PKCS12_STACK_OF(PKCS12_SAFEBAG)
 
 typedef struct pkcs12_bag_st {
     ASN1_OBJECT *type;
@@ -182,8 +184,6 @@ PKCS8_PRIV_KEY_INFO *PKCS12_decrypt_skey(PKCS12_SAFEBAG *bag,
 X509_SIG *PKCS8_encrypt(int pbe_nid, const EVP_CIPHER *cipher,
                         const char *pass, int passlen, unsigned char *salt,
                         int saltlen, int iter, PKCS8_PRIV_KEY_INFO *p8);
-X509_SIG *PKCS8_set0_pbe(const char *pass, int passlen,
-                        PKCS8_PRIV_KEY_INFO *p8inf, X509_ALGOR *pbe);
 PKCS12_SAFEBAG *PKCS12_MAKE_SHKEYBAG(int pbe_nid, const char *pass,
                                      int passlen, unsigned char *salt,
                                      int saltlen, int iter,
@@ -311,7 +311,6 @@ void ERR_load_PKCS12_strings(void);
 # define PKCS12_F_PKCS12_VERIFY_MAC                       126
 # define PKCS12_F_PKCS8_ADD_KEYUSAGE                      124
 # define PKCS12_F_PKCS8_ENCRYPT                           125
-# define PKCS12_F_PKCS8_SET0_PBE                          132
 
 /* Reason codes. */
 # define PKCS12_R_CANT_PACK_STRUCTURE                     100

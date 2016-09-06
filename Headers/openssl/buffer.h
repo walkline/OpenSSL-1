@@ -78,21 +78,23 @@ struct buf_mem_st {
     size_t length;              /* current number of bytes */
     char *data;
     size_t max;                 /* size of buffer */
-    unsigned long flags;
 };
 
-# define BUF_MEM_FLAG_SECURE  0x01
-
 BUF_MEM *BUF_MEM_new(void);
-BUF_MEM *BUF_MEM_new_ex(unsigned long flags);
 void BUF_MEM_free(BUF_MEM *a);
-size_t BUF_MEM_grow(BUF_MEM *str, size_t len);
-size_t BUF_MEM_grow_clean(BUF_MEM *str, size_t len);
+int BUF_MEM_grow(BUF_MEM *str, size_t len);
+int BUF_MEM_grow_clean(BUF_MEM *str, size_t len);
 size_t BUF_strnlen(const char *str, size_t maxlen);
 char *BUF_strdup(const char *str);
+
+/*
+ * Like strndup, but in addition, explicitly guarantees to never read past the
+ * first |siz| bytes of |str|.
+ */
 char *BUF_strndup(const char *str, size_t siz);
+
 void *BUF_memdup(const void *data, size_t siz);
-void BUF_reverse(unsigned char *out, unsigned char *in, size_t siz);
+void BUF_reverse(unsigned char *out, const unsigned char *in, size_t siz);
 
 /* safe string functions */
 size_t BUF_strlcpy(char *dst, const char *src, size_t siz);

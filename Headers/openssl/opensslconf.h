@@ -5,29 +5,26 @@
 extern "C" {
 #endif
 /* OpenSSL was configured with the following options: */
-#ifndef OPENSSL_SYS_MACOSX
-# define OPENSSL_SYS_MACOSX
+#ifndef OPENSSL_SYSNAME_MACOSX
+# define OPENSSL_SYSNAME_MACOSX
 #endif
 #ifndef OPENSSL_DOING_MAKEDEPEND
 
 
-#ifndef OPENSSL_NO_DEPRECATED
-# define OPENSSL_NO_DEPRECATED
-#endif
 #ifndef OPENSSL_NO_EC_NISTP_64_GCC_128
 # define OPENSSL_NO_EC_NISTP_64_GCC_128
 #endif
 #ifndef OPENSSL_NO_GMP
 # define OPENSSL_NO_GMP
 #endif
-#ifndef OPENSSL_NO_GOST
-# define OPENSSL_NO_GOST
-#endif
 #ifndef OPENSSL_NO_JPAKE
 # define OPENSSL_NO_JPAKE
 #endif
 #ifndef OPENSSL_NO_KRB5
 # define OPENSSL_NO_KRB5
+#endif
+#ifndef OPENSSL_NO_LIBUNBOUND
+# define OPENSSL_NO_LIBUNBOUND
 #endif
 #ifndef OPENSSL_NO_MD2
 # define OPENSSL_NO_MD2
@@ -44,11 +41,17 @@ extern "C" {
 #ifndef OPENSSL_NO_SSL_TRACE
 # define OPENSSL_NO_SSL_TRACE
 #endif
+#ifndef OPENSSL_NO_SSL2
+# define OPENSSL_NO_SSL2
+#endif
 #ifndef OPENSSL_NO_STORE
 # define OPENSSL_NO_STORE
 #endif
 #ifndef OPENSSL_NO_UNIT_TEST
 # define OPENSSL_NO_UNIT_TEST
+#endif
+#ifndef OPENSSL_NO_WEAK_SSL_CIPHERS
+# define OPENSSL_NO_WEAK_SSL_CIPHERS
 #endif
 
 #endif /* OPENSSL_DOING_MAKEDEPEND */
@@ -68,23 +71,20 @@ extern "C" {
    who haven't had the time to do the appropriate changes in their
    applications.  */
 #ifdef OPENSSL_ALGORITHM_DEFINES
-# if defined(OPENSSL_NO_DEPRECATED) && !defined(NO_DEPRECATED)
-#  define NO_DEPRECATED
-# endif
 # if defined(OPENSSL_NO_EC_NISTP_64_GCC_128) && !defined(NO_EC_NISTP_64_GCC_128)
 #  define NO_EC_NISTP_64_GCC_128
 # endif
 # if defined(OPENSSL_NO_GMP) && !defined(NO_GMP)
 #  define NO_GMP
 # endif
-# if defined(OPENSSL_NO_GOST) && !defined(NO_GOST)
-#  define NO_GOST
-# endif
 # if defined(OPENSSL_NO_JPAKE) && !defined(NO_JPAKE)
 #  define NO_JPAKE
 # endif
 # if defined(OPENSSL_NO_KRB5) && !defined(NO_KRB5)
 #  define NO_KRB5
+# endif
+# if defined(OPENSSL_NO_LIBUNBOUND) && !defined(NO_LIBUNBOUND)
+#  define NO_LIBUNBOUND
 # endif
 # if defined(OPENSSL_NO_MD2) && !defined(NO_MD2)
 #  define NO_MD2
@@ -101,40 +101,29 @@ extern "C" {
 # if defined(OPENSSL_NO_SSL_TRACE) && !defined(NO_SSL_TRACE)
 #  define NO_SSL_TRACE
 # endif
+# if defined(OPENSSL_NO_SSL2) && !defined(NO_SSL2)
+#  define NO_SSL2
+# endif
 # if defined(OPENSSL_NO_STORE) && !defined(NO_STORE)
 #  define NO_STORE
 # endif
 # if defined(OPENSSL_NO_UNIT_TEST) && !defined(NO_UNIT_TEST)
 #  define NO_UNIT_TEST
 # endif
+# if defined(OPENSSL_NO_WEAK_SSL_CIPHERS) && !defined(NO_WEAK_SSL_CIPHERS)
+#  define NO_WEAK_SSL_CIPHERS
+# endif
 #endif
 
 /* crypto/opensslconf.h.in */
-
-/*
- * Applications should use -DOPENSSL_USE_DEPRECATED to enable access to
- * deprecated functions. But if the library has been built to disable
- * deprecated functions then this will not work
- */
-#if defined(OPENSSL_NO_DEPRECATED) && defined(OPENSSL_USE_DEPRECATED)
-#error "OPENSSL_USE_DEPRECATED has been defined, but OpenSSL has been built without support for deprecated functions"
-#endif
-
-/* Test for support for deprecated attribute */
-#if __GNUC__ > 3 || \
-  (__GNUC__ == 3 && __GNUC_MINOR__ > 0)
-#define DECLARE_DEPRECATED(f)    f __attribute__ ((deprecated))
-#else
-#define DECLARE_DEPRECATED(f)    f
-#endif
 
 /* Generate 80386 code? */
 #undef I386_ONLY
 
 #if !(defined(VMS) || defined(__VMS)) /* VMS uses logical names instead */
 #if defined(HEADER_CRYPTLIB_H) && !defined(OPENSSLDIR)
-#define ENGINESDIR "/usr/local/ssl/lib/engines"
-#define OPENSSLDIR "/usr/local/ssl"
+#define ENGINESDIR "/Users/marste/Downloads/OpenSSL-for-iPhone-master/bin/iPhoneSimulator9.3-x86_64.sdk/lib/engines"
+#define OPENSSLDIR "/Users/marste/Downloads/OpenSSL-for-iPhone-master/bin/iPhoneSimulator9.3-x86_64.sdk"
 #endif
 #endif
 
@@ -248,7 +237,7 @@ extern "C" {
    optimization options.  Older Sparc's work better with only UNROLL, but
    there's no way to tell at compile time what it is you're running on */
  
-#if defined( sun )		/* Newer Sparc's */
+#if defined( __sun ) || defined ( sun )		/* Newer Sparc's */
 #  define DES_PTR
 #  define DES_RISC1
 #  define DES_UNROLL
@@ -265,6 +254,8 @@ extern "C" {
   /* Unknown */
 #elif defined( __aux )		/* 68K */
   /* Unknown */
+#elif defined( __dgux )		/* 88K (but P6 in latest boxes) */
+#  define DES_UNROLL
 #elif defined( __sgi )		/* Newer MIPS */
 #  define DES_PTR
 #  define DES_RISC2

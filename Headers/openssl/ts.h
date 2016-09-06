@@ -62,9 +62,15 @@
 
 # include <openssl/opensslconf.h>
 # include <openssl/symhacks.h>
-# include <openssl/buffer.h>
-# include <openssl/evp.h>
-# include <openssl/bio.h>
+# ifndef OPENSSL_NO_BUFFER
+#  include <openssl/buffer.h>
+# endif
+# ifndef OPENSSL_NO_EVP
+#  include <openssl/evp.h>
+# endif
+# ifndef OPENSSL_NO_BIO
+#  include <openssl/bio.h>
+# endif
 # include <openssl/stack.h>
 # include <openssl/asn1.h>
 # include <openssl/safestack.h>
@@ -213,6 +219,7 @@ typedef struct TS_status_info_st {
 } TS_STATUS_INFO;
 
 DECLARE_STACK_OF(ASN1_UTF8STRING)
+DECLARE_ASN1_SET_OF(ASN1_UTF8STRING)
 
 /*-
 TimeStampResp ::= SEQUENCE  {
@@ -253,6 +260,7 @@ typedef struct ESS_cert_id {
 } ESS_CERT_ID;
 
 DECLARE_STACK_OF(ESS_CERT_ID)
+DECLARE_ASN1_SET_OF(ESS_CERT_ID)
 
 /*-
 SigningCertificate ::=  SEQUENCE {
@@ -514,6 +522,7 @@ typedef struct TS_resp_ctx {
 } TS_RESP_CTX;
 
 DECLARE_STACK_OF(EVP_MD)
+DECLARE_ASN1_SET_OF(EVP_MD)
 
 /* Creates a response context that can be used for generating responses. */
 TS_RESP_CTX *TS_RESP_CTX_new(void);
@@ -775,11 +784,6 @@ void ERR_load_TS_strings(void);
 # define TS_F_TS_CHECK_SIGNING_CERTS                      103
 # define TS_F_TS_CHECK_STATUS_INFO                        104
 # define TS_F_TS_COMPUTE_IMPRINT                          145
-# define TS_F_TS_CONF_INVALID                             151
-# define TS_F_TS_CONF_LOAD_CERT                           153
-# define TS_F_TS_CONF_LOAD_CERTS                          154
-# define TS_F_TS_CONF_LOAD_KEY                            155
-# define TS_F_TS_CONF_LOOKUP_FAIL                         152
 # define TS_F_TS_CONF_SET_DEFAULT_ENGINE                  146
 # define TS_F_TS_GET_STATUS_TEXT                          105
 # define TS_F_TS_MSG_IMPRINT_SET_ALGO                     118
@@ -818,8 +822,6 @@ void ERR_load_TS_strings(void);
 /* Reason codes. */
 # define TS_R_BAD_PKCS7_TYPE                              132
 # define TS_R_BAD_TYPE                                    133
-# define TS_R_CANNOT_LOAD_CERT                            137
-# define TS_R_CANNOT_LOAD_KEY                             138
 # define TS_R_CERTIFICATE_VERIFY_ERROR                    100
 # define TS_R_COULD_NOT_SET_ENGINE                        127
 # define TS_R_COULD_NOT_SET_TIME                          115
@@ -852,8 +854,6 @@ void ERR_load_TS_strings(void);
 # define TS_R_UNACCEPTABLE_POLICY                         125
 # define TS_R_UNSUPPORTED_MD_ALGORITHM                    126
 # define TS_R_UNSUPPORTED_VERSION                         113
-# define TS_R_VAR_BAD_VALUE                               135
-# define TS_R_VAR_LOOKUP_FAILURE                          136
 # define TS_R_WRONG_CONTENT_TYPE                          114
 
 #ifdef  __cplusplus

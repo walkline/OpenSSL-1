@@ -71,7 +71,7 @@
 #  error ENGINE is disabled.
 # endif
 
-# ifdef OPENSSL_USE_DEPRECATED
+# ifndef OPENSSL_NO_DEPRECATED
 #  include <openssl/bn.h>
 #  ifndef OPENSSL_NO_RSA
 #   include <openssl/rsa.h>
@@ -82,8 +82,10 @@
 #  ifndef OPENSSL_NO_DH
 #   include <openssl/dh.h>
 #  endif
-#  ifndef OPENSSL_NO_EC
+#  ifndef OPENSSL_NO_ECDH
 #   include <openssl/ecdh.h>
+#  endif
+#  ifndef OPENSSL_NO_ECDSA
 #   include <openssl/ecdsa.h>
 #  endif
 #  include <openssl/rand.h>
@@ -776,6 +778,8 @@ typedef struct st_dynamic_LOCK_fns {
 /* The top-level structure */
 typedef struct st_dynamic_fns {
     void *static_state;
+    const ERR_FNS *err_fns;
+    const CRYPTO_EX_DATA_IMPL *ex_data_fns;
     dynamic_MEM_fns mem_fns;
     dynamic_LOCK_fns lock_fns;
 } dynamic_fns;
@@ -833,6 +837,9 @@ typedef int (*dynamic_bind_engine) (ENGINE *e, const char *id,
                 CRYPTO_set_dynlock_create_callback(fns->lock_fns.dynlock_create_cb); \
                 CRYPTO_set_dynlock_lock_callback(fns->lock_fns.dynlock_lock_cb); \
                 CRYPTO_set_dynlock_destroy_callback(fns->lock_fns.dynlock_destroy_cb); \
+                if(!CRYPTO_set_ex_data_implementation(fns->ex_data_fns)) \
+                        return 0; \
+                if(!ERR_set_implementation(fns->err_fns)) return 0; \
         skip_cbs: \
                 if(!fn(e,id)) return 0; \
                 return 1; }

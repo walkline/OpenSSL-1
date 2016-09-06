@@ -118,11 +118,10 @@
 # define HEADER_CRYPTO_H
 
 # include <stdlib.h>
-# include <time.h>
 
 # include <openssl/e_os2.h>
 
-# ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_FP_API
 #  include <stdio.h>
 # endif
 
@@ -157,6 +156,20 @@ extern "C" {
 # define SSLEAY_BUILT_ON         3
 # define SSLEAY_PLATFORM         4
 # define SSLEAY_DIR              5
+
+/* Already declared in ossl_typ.h */
+# if 0
+typedef struct crypto_ex_data_st CRYPTO_EX_DATA;
+/* Called when a new object is created */
+typedef int CRYPTO_EX_new (void *parent, void *ptr, CRYPTO_EX_DATA *ad,
+                           int idx, long argl, void *argp);
+/* Called when an object is free()ed */
+typedef void CRYPTO_EX_free (void *parent, void *ptr, CRYPTO_EX_DATA *ad,
+                             int idx, long argl, void *argp);
+/* Called when we need to dup an object */
+typedef int CRYPTO_EX_dup (CRYPTO_EX_DATA *to, CRYPTO_EX_DATA *from,
+                           void *from_d, int idx, long argl, void *argp);
+# endif
 
 /* A generic structure to pass assorted data in a expandable way */
 typedef struct openssl_item_st {
@@ -284,9 +297,25 @@ struct crypto_ex_data_st {
 DECLARE_STACK_OF(void)
 
 /*
+ * This stuff is basically class callback functions The current classes are
+ * SSL_CTX, SSL, SSL_SESSION, and a few more
+ */
+
+typedef struct crypto_ex_data_func_st {
+    long argl;                  /* Arbitary long */
+    void *argp;                 /* Arbitary void * */
+    CRYPTO_EX_new *new_func;
+    CRYPTO_EX_free *free_func;
+    CRYPTO_EX_dup *dup_func;
+} CRYPTO_EX_DATA_FUNCS;
+
+DECLARE_STACK_OF(CRYPTO_EX_DATA_FUNCS)
+
+/*
  * Per class, we have a STACK of CRYPTO_EX_DATA_FUNCS for each CRYPTO_EX_DATA
  * entry.
  */
+
 # define CRYPTO_EX_INDEX_BIO             0
 # define CRYPTO_EX_INDEX_SSL             1
 # define CRYPTO_EX_INDEX_SSL_CTX         2
@@ -303,8 +332,12 @@ DECLARE_STACK_OF(void)
 # define CRYPTO_EX_INDEX_ECDH            13
 # define CRYPTO_EX_INDEX_COMP            14
 # define CRYPTO_EX_INDEX_STORE           15
-# define CRYPTO_EX_INDEX_APP             16
-# define CRYPTO_EX_INDEX__COUNT          17
+
+/*
+ * Dynamically assigned indexes start from this value (don't use directly,
+ * use via CRYPTO_ex_data_new_class).
+ */
+# define CRYPTO_EX_INDEX_USER            100
 
 /*
  * This is the default callbacks, but we can have others as well: this is
@@ -353,19 +386,26 @@ int CRYPTO_is_mem_check_on(void);
         CRYPTO_realloc_clean(addr,old_num,num,__FILE__,__LINE__)
 # define OPENSSL_remalloc(addr,num) \
         CRYPTO_remalloc((char **)addr,(int)num,__FILE__,__LINE__)
-# define OPENSSL_clear_free(addr, num) CRYPTO_clear_free(addr, num)
+# define OPENSSL_freeFunc        CRYPTO_free
 # define OPENSSL_free(addr)      CRYPTO_free(addr)
 
 # define OPENSSL_malloc_locked(num) \
         CRYPTO_malloc_locked((int)num,__FILE__,__LINE__)
 # define OPENSSL_free_locked(addr) CRYPTO_free_locked(addr)
-# define OPENSSL_MALLOC_MAX_NELEMS(type)  (((1U<<(sizeof(int)*8-1))-1)/sizeof(type))
 
 const char *SSLeay_version(int type);
 unsigned long SSLeay(void);
 
 int OPENSSL_issetugid(void);
 
+/* An opaque type representing an implementation of "ex_data" support */
+typedef struct st_CRYPTO_EX_DATA_IMPL CRYPTO_EX_DATA_IMPL;
+/* Return an opaque pointer to the current "ex_data" implementation */
+const CRYPTO_EX_DATA_IMPL *CRYPTO_get_ex_data_implementation(void);
+/* Sets the "ex_data" implementation to be used (if it's not too late) */
+int CRYPTO_set_ex_data_implementation(const CRYPTO_EX_DATA_IMPL *i);
+/* Get a new "ex_data" class, and return the corresponding "class_index" */
+int CRYPTO_ex_data_new_class(void);
 /* Within a given class, get/register a new index */
 int CRYPTO_get_ex_new_index(int class_index, long argl, void *argp,
                             CRYPTO_EX_new *new_func, CRYPTO_EX_dup *dup_func,
@@ -418,14 +458,10 @@ void CRYPTO_THREADID_current(CRYPTO_THREADID *id);
 int CRYPTO_THREADID_cmp(const CRYPTO_THREADID *a, const CRYPTO_THREADID *b);
 void CRYPTO_THREADID_cpy(CRYPTO_THREADID *dest, const CRYPTO_THREADID *src);
 unsigned long CRYPTO_THREADID_hash(const CRYPTO_THREADID *id);
-# ifdef OPENSSL_USE_DEPRECATED
-DECLARE_DEPRECATED(void CRYPTO_set_id_callback(unsigned long (*func) (void)));
-/*
- * mkdef.pl cannot handle this next one so not inside DECLARE_DEPRECATED,
- * but still inside OPENSSL_USE_DEPRECATED
- */
+# ifndef OPENSSL_NO_DEPRECATED
+void CRYPTO_set_id_callback(unsigned long (*func) (void));
 unsigned long (*CRYPTO_get_id_callback(void)) (void);
-DECLARE_DEPRECATED(unsigned long CRYPTO_thread_id(void));
+unsigned long CRYPTO_thread_id(void);
 # endif
 
 const char *CRYPTO_get_lock_name(int type);
@@ -463,12 +499,12 @@ void (*CRYPTO_get_dynlock_destroy_callback(void)) (struct CRYPTO_dynlock_value
 int CRYPTO_set_mem_functions(void *(*m) (size_t), void *(*r) (void *, size_t),
                              void (*f) (void *));
 int CRYPTO_set_locked_mem_functions(void *(*m) (size_t),
-                                    void (*f) (void *));
+                                    void (*free_func) (void *));
 int CRYPTO_set_mem_ex_functions(void *(*m) (size_t, const char *, int),
                                 void *(*r) (void *, size_t, const char *,
                                             int), void (*f) (void *));
 int CRYPTO_set_locked_mem_ex_functions(void *(*m) (size_t, const char *, int),
-                                       void (*f) (void *));
+                                       void (*free_func) (void *));
 int CRYPTO_set_mem_debug_functions(void (*m)
                                     (void *, int, const char *, int, int),
                                    void (*r) (void *, void *, int,
@@ -498,30 +534,10 @@ void CRYPTO_free_locked(void *ptr);
 void *CRYPTO_malloc(int num, const char *file, int line);
 char *CRYPTO_strdup(const char *str, const char *file, int line);
 void CRYPTO_free(void *ptr);
-void CRYPTO_clear_free(void *ptr, size_t num);
 void *CRYPTO_realloc(void *addr, int num, const char *file, int line);
 void *CRYPTO_realloc_clean(void *addr, int old_num, int num, const char *file,
                            int line);
 void *CRYPTO_remalloc(void *addr, int num, const char *file, int line);
-
-# define OPENSSL_secure_malloc(num) \
-        CRYPTO_secure_malloc((int)num,__FILE__,__LINE__)
-# define OPENSSL_secure_free(addr) \
-        CRYPTO_secure_free(addr)
-
-int CRYPTO_secure_malloc_init(size_t sz, int minsize);
-void CRYPTO_secure_malloc_done(void);
-void *CRYPTO_secure_malloc(int num, const char *file, int line);
-void CRYPTO_secure_free(void *ptr);
-int CRYPTO_secure_allocated(const void *ptr);
-int CRYPTO_secure_malloc_initialized(void);
-
-int CRYPTO_set_secure_mem_functions(void *(*m)(size_t), void (*f)(void *));
-int CRYPTO_set_secure_mem_ex_functions(void *(*m)(size_t,const char *,int),
-                                       void (*f)(void *));
-void CRYPTO_get_secure_mem_functions(void *(**m)(size_t), void (**f)(void *));
-void CRYPTO_get_secure_mem_ex_functions(void *(**m)(size_t,const char *,int),
-                                        void (**f)(void *));
 
 void OPENSSL_cleanse(void *ptr, size_t len);
 
@@ -561,7 +577,7 @@ void CRYPTO_dbg_free(void *addr, int before_p);
 void CRYPTO_dbg_set_options(long bits);
 long CRYPTO_dbg_get_options(void);
 
-# ifndef OPENSSL_NO_STDIO
+# ifndef OPENSSL_NO_FP_API
 void CRYPTO_mem_leaks_fp(FILE *);
 # endif
 void CRYPTO_mem_leaks(struct bio_st *bio);
@@ -574,8 +590,8 @@ void CRYPTO_mem_leaks_cb(CRYPTO_MEM_LEAK_CB *cb);
 void OpenSSLDie(const char *file, int line, const char *assertion);
 # define OPENSSL_assert(e)       (void)((e) ? 0 : (OpenSSLDie(__FILE__, __LINE__, #e),1))
 
-unsigned int *OPENSSL_ia32cap_loc(void);
-# define OPENSSL_ia32cap ((OPENSSL_ia32cap_loc())[0])
+unsigned long *OPENSSL_ia32cap_loc(void);
+# define OPENSSL_ia32cap (*(OPENSSL_ia32cap_loc()))
 int OPENSSL_isservice(void);
 
 int FIPS_mode(void);
@@ -583,10 +599,27 @@ int FIPS_mode_set(int r);
 
 void OPENSSL_init(void);
 
-struct tm *OPENSSL_gmtime(const time_t *timer, struct tm *result);
-int OPENSSL_gmtime_adj(struct tm *tm, int offset_day, long offset_sec);
-int OPENSSL_gmtime_diff(int *pday, int *psec,
-                        const struct tm *from, const struct tm *to);
+# define fips_md_init(alg) fips_md_init_ctx(alg, alg)
+
+# ifdef OPENSSL_FIPS
+#  define fips_md_init_ctx(alg, cx) \
+        int alg##_Init(cx##_CTX *c) \
+        { \
+        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
+                "Low level API call to digest " #alg " forbidden in FIPS mode!"); \
+        return private_##alg##_Init(c); \
+        } \
+        int private_##alg##_Init(cx##_CTX *c)
+
+#  define fips_cipher_abort(alg) \
+        if (FIPS_mode()) OpenSSLDie(__FILE__, __LINE__, \
+                "Low level API call to cipher " #alg " forbidden in FIPS mode!")
+
+# else
+#  define fips_md_init_ctx(alg, cx) \
+        int alg##_Init(cx##_CTX *c)
+#  define fips_cipher_abort(alg) while(0)
+# endif
 
 /*
  * CRYPTO_memcmp returns zero iff the |len| bytes at |a| and |b| are equal.
@@ -595,7 +628,7 @@ int OPENSSL_gmtime_diff(int *pday, int *psec,
  * into a defined order as the return value when a != b is undefined, other
  * than to be non-zero.
  */
-int CRYPTO_memcmp(const void *a, const void *b, size_t len);
+int CRYPTO_memcmp(const volatile void *a, const volatile void *b, size_t len);
 
 /* BEGIN ERROR CODES */
 /*
@@ -607,12 +640,9 @@ void ERR_load_CRYPTO_strings(void);
 /* Error codes for the CRYPTO functions. */
 
 /* Function codes. */
-# define CRYPTO_F_CRYPTO_DUP_EX_DATA                      110
-# define CRYPTO_F_CRYPTO_FREE_EX_DATA                     111
 # define CRYPTO_F_CRYPTO_GET_EX_NEW_INDEX                 100
 # define CRYPTO_F_CRYPTO_GET_NEW_DYNLOCKID                103
 # define CRYPTO_F_CRYPTO_GET_NEW_LOCKID                   101
-# define CRYPTO_F_CRYPTO_NEW_EX_DATA                      112
 # define CRYPTO_F_CRYPTO_SET_EX_DATA                      102
 # define CRYPTO_F_DEF_ADD_INDEX                           104
 # define CRYPTO_F_DEF_GET_CLASS                           105

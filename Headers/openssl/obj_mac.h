@@ -2354,7 +2354,7 @@
 #define OBJ_delta_crl           OBJ_id_ce,27L
 
 #define SN_issuing_distribution_point           "issuingDistributionPoint"
-#define LN_issuing_distribution_point           "X509v3 Issuing Distribution Point"
+#define LN_issuing_distribution_point           "X509v3 Issuing Distrubution Point"
 #define NID_issuing_distribution_point          770
 #define OBJ_issuing_distribution_point          OBJ_id_ce,28L
 
@@ -2579,6 +2579,11 @@
 #define NID_id_hex_multipart_message            508
 #define OBJ_id_hex_multipart_message            OBJ_mime_mhs_headings,2L
 
+#define SN_rle_compression              "RLE"
+#define LN_rle_compression              "run length compression"
+#define NID_rle_compression             124
+#define OBJ_rle_compression             1L,1L,1L,1L,666L,1L
+
 #define SN_zlib_compression             "ZLIB"
 #define LN_zlib_compression             "zlib compression"
 #define NID_zlib_compression            125
@@ -2739,18 +2744,6 @@
 #define SN_aes_256_ctr          "AES-256-CTR"
 #define LN_aes_256_ctr          "aes-256-ctr"
 #define NID_aes_256_ctr         906
-
-#define SN_aes_128_ocb          "AES-128-OCB"
-#define LN_aes_128_ocb          "aes-128-ocb"
-#define NID_aes_128_ocb         958
-
-#define SN_aes_192_ocb          "AES-192-OCB"
-#define LN_aes_192_ocb          "aes-192-ocb"
-#define NID_aes_192_ocb         959
-
-#define SN_aes_256_ocb          "AES-256-OCB"
-#define LN_aes_256_ocb          "aes-256-ocb"
-#define NID_aes_256_ocb         960
 
 #define SN_aes_128_xts          "AES-128-XTS"
 #define LN_aes_128_xts          "aes-128-xts"
@@ -3069,11 +3062,6 @@
 #define LN_friendlyCountryName          "friendlyCountryName"
 #define NID_friendlyCountryName         490
 #define OBJ_friendlyCountryName         OBJ_pilotAttributeType,43L
-
-#define SN_uniqueIdentifier             "uid"
-#define LN_uniqueIdentifier             "uniqueIdentifier"
-#define NID_uniqueIdentifier            102
-#define OBJ_uniqueIdentifier            OBJ_pilotAttributeType,44L
 
 #define LN_organizationalStatus         "organizationalStatus"
 #define NID_organizationalStatus                491
@@ -3690,10 +3678,6 @@
 #define NID_cryptocom           806
 #define OBJ_cryptocom           OBJ_member_body,643L,2L,9L
 
-#define SN_id_tc26              "id-tc26"
-#define NID_id_tc26             974
-#define OBJ_id_tc26             OBJ_member_body,643L,7L,1L
-
 #define SN_id_GostR3411_94_with_GostR3410_2001          "id-GostR3411-94-with-GostR3410-2001"
 #define LN_id_GostR3411_94_with_GostR3410_2001          "GOST R 34.11-94 with GOST R 34.10-2001"
 #define NID_id_GostR3411_94_with_GostR3410_2001         807
@@ -3732,16 +3716,10 @@
 #define SN_gost89_cnt           "gost89-cnt"
 #define NID_gost89_cnt          814
 
-#define SN_gost89_cnt_12                "gost89-cnt-12"
-#define NID_gost89_cnt_12               975
-
 #define SN_id_Gost28147_89_MAC          "gost-mac"
 #define LN_id_Gost28147_89_MAC          "GOST 28147-89 MAC"
 #define NID_id_Gost28147_89_MAC         815
 #define OBJ_id_Gost28147_89_MAC         OBJ_cryptopro,22L
-
-#define SN_gost_mac_12          "gost-mac-12"
-#define NID_gost_mac_12         976
 
 #define SN_id_GostR3411_94_prf          "prf-gostr3411-94"
 #define LN_id_GostR3411_94_prf          "GOST R 34.11-94 PRF"
@@ -3908,151 +3886,6 @@
 #define NID_id_GostR3410_2001_ParamSet_cc               854
 #define OBJ_id_GostR3410_2001_ParamSet_cc               OBJ_cryptocom,1L,8L,1L
 
-#define SN_id_tc26_algorithms           "id-tc26-algorithms"
-#define NID_id_tc26_algorithms          977
-#define OBJ_id_tc26_algorithms          OBJ_id_tc26,1L
-
-#define SN_id_tc26_sign         "id-tc26-sign"
-#define NID_id_tc26_sign                978
-#define OBJ_id_tc26_sign                OBJ_id_tc26_algorithms,1L
-
-#define SN_id_GostR3410_2012_256                "gost2012_256"
-#define LN_id_GostR3410_2012_256                "GOST R 34.10-2012 with 256 bit modulus"
-#define NID_id_GostR3410_2012_256               979
-#define OBJ_id_GostR3410_2012_256               OBJ_id_tc26_sign,1L
-
-#define SN_id_GostR3410_2012_512                "gost2012_512"
-#define LN_id_GostR3410_2012_512                "GOST R 34.10-2012 with 512 bit modulus"
-#define NID_id_GostR3410_2012_512               980
-#define OBJ_id_GostR3410_2012_512               OBJ_id_tc26_sign,2L
-
-#define SN_id_tc26_digest               "id-tc26-digest"
-#define NID_id_tc26_digest              981
-#define OBJ_id_tc26_digest              OBJ_id_tc26_algorithms,2L
-
-#define SN_id_GostR3411_2012_256                "md_gost12_256"
-#define LN_id_GostR3411_2012_256                "GOST R 34.11-2012 with 256 bit hash"
-#define NID_id_GostR3411_2012_256               982
-#define OBJ_id_GostR3411_2012_256               OBJ_id_tc26_digest,2L
-
-#define SN_id_GostR3411_2012_512                "md_gost12_512"
-#define LN_id_GostR3411_2012_512                "GOST R 34.11-2012 with 512 bit hash"
-#define NID_id_GostR3411_2012_512               983
-#define OBJ_id_GostR3411_2012_512               OBJ_id_tc26_digest,3L
-
-#define SN_id_tc26_signwithdigest               "id-tc26-signwithdigest"
-#define NID_id_tc26_signwithdigest              984
-#define OBJ_id_tc26_signwithdigest              OBJ_id_tc26_algorithms,3L
-
-#define SN_id_tc26_signwithdigest_gost3410_2012_256             "id-tc26-signwithdigest-gost3410-2012-256"
-#define LN_id_tc26_signwithdigest_gost3410_2012_256             "GOST R 34.10-2012 with GOST R 34.11-2012 (256 bit)"
-#define NID_id_tc26_signwithdigest_gost3410_2012_256            985
-#define OBJ_id_tc26_signwithdigest_gost3410_2012_256            OBJ_id_tc26_signwithdigest,2L
-
-#define SN_id_tc26_signwithdigest_gost3410_2012_512             "id-tc26-signwithdigest-gost3410-2012-512"
-#define LN_id_tc26_signwithdigest_gost3410_2012_512             "GOST R 34.10-2012 with GOST R 34.11-2012 (512 bit)"
-#define NID_id_tc26_signwithdigest_gost3410_2012_512            986
-#define OBJ_id_tc26_signwithdigest_gost3410_2012_512            OBJ_id_tc26_signwithdigest,3L
-
-#define SN_id_tc26_mac          "id-tc26-mac"
-#define NID_id_tc26_mac         987
-#define OBJ_id_tc26_mac         OBJ_id_tc26_algorithms,4L
-
-#define SN_id_tc26_hmac_gost_3411_2012_256              "id-tc26-hmac-gost-3411-2012-256"
-#define LN_id_tc26_hmac_gost_3411_2012_256              "HMAC GOST 34.11-2012 256 bit"
-#define NID_id_tc26_hmac_gost_3411_2012_256             988
-#define OBJ_id_tc26_hmac_gost_3411_2012_256             OBJ_id_tc26_mac,1L
-
-#define SN_id_tc26_hmac_gost_3411_2012_512              "id-tc26-hmac-gost-3411-2012-512"
-#define LN_id_tc26_hmac_gost_3411_2012_512              "HMAC GOST 34.11-2012 512 bit"
-#define NID_id_tc26_hmac_gost_3411_2012_512             989
-#define OBJ_id_tc26_hmac_gost_3411_2012_512             OBJ_id_tc26_mac,2L
-
-#define SN_id_tc26_cipher               "id-tc26-cipher"
-#define NID_id_tc26_cipher              990
-#define OBJ_id_tc26_cipher              OBJ_id_tc26_algorithms,5L
-
-#define SN_id_tc26_agreement            "id-tc26-agreement"
-#define NID_id_tc26_agreement           991
-#define OBJ_id_tc26_agreement           OBJ_id_tc26_algorithms,6L
-
-#define SN_id_tc26_agreement_gost_3410_2012_256         "id-tc26-agreement-gost-3410-2012-256"
-#define NID_id_tc26_agreement_gost_3410_2012_256                992
-#define OBJ_id_tc26_agreement_gost_3410_2012_256                OBJ_id_tc26_agreement,1L
-
-#define SN_id_tc26_agreement_gost_3410_2012_512         "id-tc26-agreement-gost-3410-2012-512"
-#define NID_id_tc26_agreement_gost_3410_2012_512                993
-#define OBJ_id_tc26_agreement_gost_3410_2012_512                OBJ_id_tc26_agreement,2L
-
-#define SN_id_tc26_constants            "id-tc26-constants"
-#define NID_id_tc26_constants           994
-#define OBJ_id_tc26_constants           OBJ_id_tc26,2L
-
-#define SN_id_tc26_sign_constants               "id-tc26-sign-constants"
-#define NID_id_tc26_sign_constants              995
-#define OBJ_id_tc26_sign_constants              OBJ_id_tc26_constants,1L
-
-#define SN_id_tc26_gost_3410_2012_512_constants         "id-tc26-gost-3410-2012-512-constants"
-#define NID_id_tc26_gost_3410_2012_512_constants                996
-#define OBJ_id_tc26_gost_3410_2012_512_constants                OBJ_id_tc26_sign_constants,2L
-
-#define SN_id_tc26_gost_3410_2012_512_paramSetTest              "id-tc26-gost-3410-2012-512-paramSetTest"
-#define LN_id_tc26_gost_3410_2012_512_paramSetTest              "GOST R 34.10-2012 (512 bit) testing parameter set"
-#define NID_id_tc26_gost_3410_2012_512_paramSetTest             997
-#define OBJ_id_tc26_gost_3410_2012_512_paramSetTest             OBJ_id_tc26_gost_3410_2012_512_constants,0L
-
-#define SN_id_tc26_gost_3410_2012_512_paramSetA         "id-tc26-gost-3410-2012-512-paramSetA"
-#define LN_id_tc26_gost_3410_2012_512_paramSetA         "GOST R 34.10-2012 (512 bit) ParamSet A"
-#define NID_id_tc26_gost_3410_2012_512_paramSetA                998
-#define OBJ_id_tc26_gost_3410_2012_512_paramSetA                OBJ_id_tc26_gost_3410_2012_512_constants,1L
-
-#define SN_id_tc26_gost_3410_2012_512_paramSetB         "id-tc26-gost-3410-2012-512-paramSetB"
-#define LN_id_tc26_gost_3410_2012_512_paramSetB         "GOST R 34.10-2012 (512 bit) ParamSet B"
-#define NID_id_tc26_gost_3410_2012_512_paramSetB                999
-#define OBJ_id_tc26_gost_3410_2012_512_paramSetB                OBJ_id_tc26_gost_3410_2012_512_constants,2L
-
-#define SN_id_tc26_digest_constants             "id-tc26-digest-constants"
-#define NID_id_tc26_digest_constants            1000
-#define OBJ_id_tc26_digest_constants            OBJ_id_tc26_constants,2L
-
-#define SN_id_tc26_cipher_constants             "id-tc26-cipher-constants"
-#define NID_id_tc26_cipher_constants            1001
-#define OBJ_id_tc26_cipher_constants            OBJ_id_tc26_constants,5L
-
-#define SN_id_tc26_gost_28147_constants         "id-tc26-gost-28147-constants"
-#define NID_id_tc26_gost_28147_constants                1002
-#define OBJ_id_tc26_gost_28147_constants                OBJ_id_tc26_cipher_constants,1L
-
-#define SN_id_tc26_gost_28147_param_Z           "id-tc26-gost-28147-param-Z"
-#define LN_id_tc26_gost_28147_param_Z           "GOST 28147-89 TC26 parameter set"
-#define NID_id_tc26_gost_28147_param_Z          1003
-#define OBJ_id_tc26_gost_28147_param_Z          OBJ_id_tc26_gost_28147_constants,1L
-
-#define SN_INN          "INN"
-#define LN_INN          "INN"
-#define NID_INN         1004
-#define OBJ_INN         OBJ_member_body,643L,3L,131L,1L,1L
-
-#define SN_OGRN         "OGRN"
-#define LN_OGRN         "OGRN"
-#define NID_OGRN                1005
-#define OBJ_OGRN                OBJ_member_body,643L,100L,1L
-
-#define SN_SNILS                "SNILS"
-#define LN_SNILS                "SNILS"
-#define NID_SNILS               1006
-#define OBJ_SNILS               OBJ_member_body,643L,100L,3L
-
-#define SN_subjectSignTool              "subjectSignTool"
-#define LN_subjectSignTool              "Signing Tool of Subject"
-#define NID_subjectSignTool             1007
-#define OBJ_subjectSignTool             OBJ_member_body,643L,100L,111L
-
-#define SN_issuerSignTool               "issuerSignTool"
-#define LN_issuerSignTool               "Signing Tool of Issuer"
-#define NID_issuerSignTool              1008
-#define OBJ_issuerSignTool              OBJ_member_body,643L,100L,112L
-
 #define SN_camellia_128_cbc             "CAMELLIA-128-CBC"
 #define LN_camellia_128_cbc             "camellia-128-cbc"
 #define NID_camellia_128_cbc            751
@@ -4099,26 +3932,6 @@
 #define NID_camellia_128_cfb128         757
 #define OBJ_camellia_128_cfb128         OBJ_camellia,4L
 
-#define SN_camellia_128_gcm             "CAMELLIA-128-GCM"
-#define LN_camellia_128_gcm             "camellia-128-gcm"
-#define NID_camellia_128_gcm            961
-#define OBJ_camellia_128_gcm            OBJ_camellia,6L
-
-#define SN_camellia_128_ccm             "CAMELLIA-128-CCM"
-#define LN_camellia_128_ccm             "camellia-128-ccm"
-#define NID_camellia_128_ccm            962
-#define OBJ_camellia_128_ccm            OBJ_camellia,7L
-
-#define SN_camellia_128_ctr             "CAMELLIA-128-CTR"
-#define LN_camellia_128_ctr             "camellia-128-ctr"
-#define NID_camellia_128_ctr            963
-#define OBJ_camellia_128_ctr            OBJ_camellia,9L
-
-#define SN_camellia_128_cmac            "CAMELLIA-128-CMAC"
-#define LN_camellia_128_cmac            "camellia-128-cmac"
-#define NID_camellia_128_cmac           964
-#define OBJ_camellia_128_cmac           OBJ_camellia,10L
-
 #define SN_camellia_192_ecb             "CAMELLIA-192-ECB"
 #define LN_camellia_192_ecb             "camellia-192-ecb"
 #define NID_camellia_192_ecb            755
@@ -4134,26 +3947,6 @@
 #define NID_camellia_192_cfb128         758
 #define OBJ_camellia_192_cfb128         OBJ_camellia,24L
 
-#define SN_camellia_192_gcm             "CAMELLIA-192-GCM"
-#define LN_camellia_192_gcm             "camellia-192-gcm"
-#define NID_camellia_192_gcm            965
-#define OBJ_camellia_192_gcm            OBJ_camellia,26L
-
-#define SN_camellia_192_ccm             "CAMELLIA-192-CCM"
-#define LN_camellia_192_ccm             "camellia-192-ccm"
-#define NID_camellia_192_ccm            966
-#define OBJ_camellia_192_ccm            OBJ_camellia,27L
-
-#define SN_camellia_192_ctr             "CAMELLIA-192-CTR"
-#define LN_camellia_192_ctr             "camellia-192-ctr"
-#define NID_camellia_192_ctr            967
-#define OBJ_camellia_192_ctr            OBJ_camellia,29L
-
-#define SN_camellia_192_cmac            "CAMELLIA-192-CMAC"
-#define LN_camellia_192_cmac            "camellia-192-cmac"
-#define NID_camellia_192_cmac           968
-#define OBJ_camellia_192_cmac           OBJ_camellia,30L
-
 #define SN_camellia_256_ecb             "CAMELLIA-256-ECB"
 #define LN_camellia_256_ecb             "camellia-256-ecb"
 #define NID_camellia_256_ecb            756
@@ -4168,26 +3961,6 @@
 #define LN_camellia_256_cfb128          "camellia-256-cfb"
 #define NID_camellia_256_cfb128         759
 #define OBJ_camellia_256_cfb128         OBJ_camellia,44L
-
-#define SN_camellia_256_gcm             "CAMELLIA-256-GCM"
-#define LN_camellia_256_gcm             "camellia-256-gcm"
-#define NID_camellia_256_gcm            969
-#define OBJ_camellia_256_gcm            OBJ_camellia,46L
-
-#define SN_camellia_256_ccm             "CAMELLIA-256-CCM"
-#define LN_camellia_256_ccm             "camellia-256-ccm"
-#define NID_camellia_256_ccm            970
-#define OBJ_camellia_256_ccm            OBJ_camellia,47L
-
-#define SN_camellia_256_ctr             "CAMELLIA-256-CTR"
-#define LN_camellia_256_ctr             "camellia-256-ctr"
-#define NID_camellia_256_ctr            971
-#define OBJ_camellia_256_ctr            OBJ_camellia,49L
-
-#define SN_camellia_256_cmac            "CAMELLIA-256-CMAC"
-#define LN_camellia_256_cmac            "camellia-256-cmac"
-#define NID_camellia_256_cmac           972
-#define OBJ_camellia_256_cmac           OBJ_camellia,50L
 
 #define SN_camellia_128_cfb1            "CAMELLIA-128-CFB1"
 #define LN_camellia_128_cfb1            "camellia-128-cfb1"
@@ -4419,7 +4192,3 @@
 #define LN_jurisdictionCountryName              "jurisdictionCountryName"
 #define NID_jurisdictionCountryName             957
 #define OBJ_jurisdictionCountryName             1L,3L,6L,1L,4L,1L,311L,60L,2L,1L,3L
-
-#define SN_id_scrypt            "id-scrypt"
-#define NID_id_scrypt           973
-#define OBJ_id_scrypt           1L,3L,6L,1L,4L,1L,11591L,4L,11L
