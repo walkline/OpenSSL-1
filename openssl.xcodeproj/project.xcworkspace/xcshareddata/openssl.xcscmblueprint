@@ -12,7 +12,7 @@
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "55A7FB660E25DAD7EFF279C9F437500B47348AC7" : "openssl-xcode\/openssl\/",
     "D482924C5AFED88D3216BDD72C2302DD55AD6268" : "openssl-xcode\/",
-    "1C162451C0A5124749DE647734491A932A8186D3" : "OpenSSL\/"
+    "1C162451C0A5124749DE647734491A932A8186D3" : "OpenSSLCarthage\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "openssl",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
